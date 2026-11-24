@@ -1,0 +1,105 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradeDeck</title>
+    <script src="https://unpkg.com/lightweight-charts@4.2.3/dist/lightweight-charts.standalone.production.js"></script>
+    <link rel="stylesheet" href="style.css?v=20261122b">
+</head>
+<body>
+
+<div class="app v4">
+
+    <!-- hidden hooks scanner.js still expects (buttons moved into the tabs) -->
+    <div style="display:none">
+        <div class="risk-cluster">
+            <input id="acctSize" type="number" value="100000"><input id="riskPct" type="number" value="0.5">
+            <input id="dayCap" type="number" value="3"><input id="maxOpen" type="number" value="2"><input id="scannerRisk" type="hidden" value="250">
+        </div>
+        <button id="recordBtn" class="ghost">Record</button>
+    </div>
+
+    <div id="acctStrip" class="acct-strip">
+        <button id="scannerBtn" class="toggle">Scanner off</button>
+        <span class="as-item"><b>ACCOUNT</b> <span id="asAcct" title="click: every account">not connected</span> <span id="asCaret">&#9662;</span></span>
+        <div id="asDrop" class="as-drop hidden"></div>
+        <span id="asAlert" class="as-item as-alert hidden" title="click to dismiss"></span>
+        <span class="as-item" id="asMode">—</span>
+        <span class="as-item">Equity <b id="asEquity">—</b></span>
+        <span class="as-item">Today <b id="asToday">—</b> <small id="asTodayLim"></small></span>
+        <span class="as-item">Total <b id="asTotal">—</b> <small id="asTotalLim"></small></span>
+        <span class="as-item">Risk/trade <b id="asRisk">—</b></span>
+        <span class="as-item">Open <b id="asOpen">—</b></span>
+        <span class="as-item" id="asAcct2"></span>
+        <span class="as-spacer"></span>
+        <div class="connection" id="connectionStatus"><span class="dot" id="connectionDot"></span><span id="connectionText">Offline</span></div>
+        <span id="voiceBtn" class="voice" title="Voice alerts on/off">🔊</span>
+    </div>
+
+    <!-- the coins the bot trades, side by side, each with its own setup pins -->
+    <section id="chartRow" class="chart-row"></section>
+
+    <aside class="strat-side">
+        <div class="side-block watchlist">
+            <div class="side-head">Markets</div>
+            <div class="market active" data-symbol="BTC" data-tier="playbook"><b>BTC</b><span class="market-status">—</span></div>
+            <div class="market" data-symbol="ETH" data-tier="playbook"><b>ETH</b><span class="market-status">—</span></div>
+            <div class="market" data-symbol="XRP" data-tier="playbook"><b>XRP</b><span class="market-status">—</span></div>
+            <div class="market" data-symbol="SOL" data-tier="unproven"><b>SOL</b><span class="market-status">—</span></div>
+            <div class="market" data-symbol="HYPE" data-tier="unproven"><b>HYPE</b><span class="market-status">—</span></div>
+            <div class="market" data-symbol="LINK" data-tier="unproven"><b>LINK</b><span class="market-status">—</span></div>
+            <div class="market" data-symbol="DOGE" data-tier="unproven"><b>DOGE</b><span class="market-status">—</span></div>
+            <div class="market" data-symbol="AVAX" data-tier="negative"><b>AVAX</b><span class="market-status">—</span></div>
+            <div class="market" data-symbol="SUI" data-tier="negative"><b>SUI</b><span class="market-status">—</span></div>
+        </div>
+
+    </aside>
+
+    <div id="splitter" class="splitter" title="Drag up or down"></div>
+
+    <section class="lower">
+        <div class="lower-tabs">
+            <button class="tab active" data-tab="trades">Trades</button>
+            <button class="tab" data-tab="alerts">Alerts <span class="badge" id="alertCount">0</span></button>
+            <button class="tab" data-tab="data">Data</button>
+            <button class="tab" data-tab="news">News</button>
+            <button class="tab" data-tab="engines">Engines</button>
+        </div>
+        <div class="lower-pane hidden" id="pane-record">
+            <div id="recordSummary" class="record-summary">Press Record to grade every call.</div>
+            <div class="table-wrap"><table id="recordTable" class="record-table"></table></div>
+        </div>
+        <div class="lower-pane" id="pane-trades">
+            <div id="tradesSummary" class="trades-views"><button class="tv-btn active" data-view="rows">Rows</button><button class="tv-btn" data-view="cal">Calendar</button><span id="tradesEvents" class="tv-events"></span></div>
+            <div class="table-wrap" id="tradesRowsWrap"><table id="tradesTable" class="record-table"></table></div>
+            <div class="table-wrap hidden" id="tradesCal"></div>
+        </div>
+        <div class="lower-pane hidden" id="pane-strategies">
+            <div id="stratSummary" class="record-summary">Every strategy the bot runs, its trades and P&amp;L. Click one to see its trades.</div>
+            <div class="table-wrap"><table id="stratTable" class="record-table"></table><table id="stratTrades" class="record-table"></table></div>
+        </div>
+        <div class="lower-pane hidden" id="pane-data"></div>
+        <div class="lower-pane hidden" id="pane-news"></div>
+        <div class="lower-pane hidden" id="pane-engines"><div class="eng-wrap" id="engWrap">loading engines…</div></div>
+        <div class="lower-pane hidden" id="pane-alerts">
+            <div id="alertFeed" class="alert-feed">
+                <div class="feed-empty">No calls yet. The scanner posts here when a setup completes.</div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <span id="systemStatus">System online</span>
+        <span id="selectedMarket">BTC selected</span>
+        <span id="dataStatus">Data: not connected</span>
+        <span id="marketSource">Hyperliquid perpetual</span>
+    </footer>
+
+</div>
+
+<script src="app.js?v=20261122b"></script>
+<script src="scanner.js?v=20261122b"></script>
+<script src="engines.js?v=20261122b"></script>
+</body>
+</html>
